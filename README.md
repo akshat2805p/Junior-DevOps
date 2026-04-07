@@ -1,206 +1,52 @@
----
-
 # 🖥️ Junior DevOps Environment
 
-> A stateful simulation of a production Linux server where AI agents practice DevOps tasks.
+> A stateful simulation of a production Linux server where AI agents practice DevOps tasks through shell interaction.
 
 ---
 
-## What Is This?
+## 🚀 Overview
 
-A stateful simulation of a production Linux server. An AI agent interacts with it
-using shell-like commands (`cat`, `grep`, `ps`, `kill`, `sed`, `restart`, …) to
-complete progressively harder system administration tasks.
+Junior-DevOps is a stateful simulation of a production Linux environment. An AI agent interacts with the server using standard shell commands (`cat`, `grep`, `ps`, `kill`, `sed`, `systemctl`, etc.) to diagnose and resolve system administration issues.
 
-The environment implements the **OpenEnv API contract**:
+The environment adheres to the **OpenEnv API contract**, making it compatible with standard RL frameworks.
+
+### API Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `reset()` | `POST /reset` | Initialize/reset the environment |
-| `step()` | `POST /step` | Execute one action, get observation + reward |
-| `state()` | `GET /state` | Read the full current state |
+| `POST` | `/reset` | Initialize or reset the environment state |
+| `POST` | `/step`  | Execute an action and return observation + reward |
+| `GET`  | `/state` | Retrieve the full current system state |
 
 ---
 
-## Task Difficulties
+## 🛠️ Task Scenarios
 
-### 🟢 Easy — Find the Error Code
-The app is crashing. Locate the error code buried in `/var/log/app.log`.
+### 🟢 Easy — Log Analysis
+The application is crashing. The agent must locate a specific error code buried within `/var/log/app.log`.
+* **Optimal Commands:** `cat /var/log/app.log` → `grep ERROR`
+* **Target:** Identify `ERR_502`
 
-**Optimal solution:**
-```bash
-cat /var/log/app.log
-grep ERROR /var/log/app.log
-echo ERR_502
-```
-**Reward:** `0.4` for opening the file · `1.0` for reporting the code
+### 🟡 Medium — Resource Management
+A rogue process is consuming 90%+ CPU, causing system latency.
+* **Optimal Commands:** `top -n 1` → `sudo kill -9 <pid>`
+* **Target:** Terminate the high-usage process.
 
----
-
-### 🟡 Medium — Kill the CPU Hog
-A rogue process is consuming 90%+ CPU and grinding the server to a halt.
-
-**Optimal solution:**
-```bash
-top
-kill 9999
-```
-**Reward:** `0.3` for inspecting processes · `1.0` for killing the rogue process
+### 🔴 Hard — Service Configuration
+Nginx is failing to start due to a port conflict; it is incorrectly configured to listen on port `5432` (reserved for PostgreSQL).
+* **Optimal Commands:** `cat /etc/nginx/nginx.conf` → `sed -i 's/5432/8080/' /etc/nginx/nginx.conf` → `sudo systemctl restart nginx`
+* **Target:** Resolve conflict and restore service.
 
 ---
 
-### 🔴 Hard — Fix the Port Conflict
-`nginx` is `failed` because its config listens on port `5432` (PostgreSQL's port).
-Fix it and restart nginx.
-
-**Optimal solution:**
-```bash
-cat /etc/nginx/nginx.conf
-sed 5432 8080 /etc/nginx/nginx.conf
-restart nginx
-```
-**Reward:** `0.2` read · `0.4` identified · `0.7` fixed · `1.0` restarted
-
----
-
-## Setup and Installation
+## 📦 Installation & Setup
 
 ### Prerequisites
-- Python 3.8+
-- Docker (optional, for containerized deployment)
+* **Python 3.9+** (Required for Numpy 1.26+ and Torch 2.3)
+* **Docker** (Optional, for containerized isolation)
 
 ### Local Development
-
-1. Clone the repository:
-```bash
-git clone https://github.com/akshat2805p/Junior-DevOps.git
-cd Junior-DevOps
-```
-
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-3. Run the server:
-```bash
-python server.py
-```
-
-The server will start on `http://localhost:7860`.
-
-### Docker Deployment
-
-Build and run with Docker:
-```bash
-docker build -t junior-devops .
-docker run -p 7860:7860 junior-devops
-```
-
-## API Usage
-
-### 1. Reset the Environment
-
-```bash
-curl -X POST http://localhost:7860/reset \
-  -H "Content-Type: application/json" \
-  -d '{"difficulty": "hard", "seed": 42}'
-```
-
-### 2. Take an Action
-
-```bash
-curl -X POST http://localhost:7860/step \
-  -H "Content-Type: application/json" \
-  -d '{"action": "cat /etc/nginx/nginx.conf"}'
-```
-
-Response:
-```json
-{
-  "observation": "worker_processes auto;\nevents { worker_connections 1024; }\nhttp {\n    listen 5432;\n    ...",
-  "reward": 0.2,
-  "done": false,
-  "info": {
-    "step": 1,
-    "checkpoints": {
-      "read_config": true,
-      "identified_conflict": false,
-      "fixed_config": false,
-      "restarted_nginx": false
-    }
-  }
-}
-```
-
-### 3. Read Current State
-
-```bash
-curl http://localhost:7860/state
-```
-
----
-
-## Running the AI Agent
-
-```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Solve easy task
-python agent.py --difficulty easy --env-url http://localhost:7860
-
-# Train via REINFORCE for 100 episodes
-python agent.py --train --difficulty hard --episodes 100
-```
-
----
-
-## Architecture
-
-```
-┌─────────────────────────────────────┐
-│         DevOps Agent (PyTorch)      │
-│  ┌─────────────┐  ┌──────────────┐  │
-│  │ Observation │  │   Policy     │  │
-│  │  Encoder   │→ │  Network     │  │
-│  │  (8-dim)   │  │  (MLP 8→64  │  │
-│  └─────────────┘  │   →64→13)  │  │
-│                   └──────┬───────┘  │
-│              action_idx  │          │
-│                   ┌──────▼───────┐  │
-│                   │  LLM Filler  │  │
-│                   │  (heuristic) │  │
-│                   └──────┬───────┘  │
-└──────────────────────────┼──────────┘
-                    action │ (shell cmd)
-                   ┌───────▼──────────┐
-                   │  JuniorDevOpsEnv │
-                   │  FastAPI Server  │
-                   │  POST /step      │
-                   └──────────────────┘
-```
-
----
-
-## Grading
-
-| Checkpoint | Easy | Medium | Hard |
-|-----------|------|--------|------|
-| Step 1    | +0.4 | +0.30  | +0.20 |
-| Step 2    | +0.6 | +0.30  | +0.20 |
-| Step 3    | —    | +0.40  | +0.30 |
-| Step 4    | —    | —      | +0.30 |
-
-Rewards are **cumulative and partial** — no binary 0/1 scoring.
-
----
-
-## Contributing
-
-Feel free to open issues or submit pull requests for improvements.
-
-## License
-
-MIT License
-
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/akshat2805p/Junior-DevOps.git](https://github.com/akshat2805p/Junior-DevOps.git)
+   cd Junior-DevOps
