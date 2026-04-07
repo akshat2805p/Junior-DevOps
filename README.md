@@ -1,14 +1,4 @@
 ---
-title: Junior DevOps Environment
-emoji: 🖥️
-colorFrom: indigo
-colorTo: cyan
-sdk: docker
-pinned: false
-license: mit
-app_port: 7860
-short_description: OpenEnv-compatible Linux server simulation for AI agents
----
 
 # 🖥️ Junior DevOps Environment
 
