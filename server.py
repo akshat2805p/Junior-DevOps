@@ -1,14 +1,5 @@
-"""
-FastAPI server — exposes JuniorDevOpsEnv over HTTP (OpenEnv-compatible).
-
-Endpoints
----------
-POST /reset          Reset the environment (body: {"difficulty": "easy|medium|hard", "seed": int})
-POST /step           Take an action     (body: {"action": "..."})
-GET  /state          Read current state
-GET  /health         Health check
-GET  /docs           Auto-generated Swagger UI
-"""
+# FastAPI server for Junior DevOps Environment
+# Exposes the environment over HTTP
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware

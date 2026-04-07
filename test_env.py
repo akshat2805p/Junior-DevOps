@@ -1,8 +1,5 @@
-"""
-Tests for JuniorDevOpsEnv — covers all three difficulty levels,
-grading logic, partial rewards, and edge cases.
-"""
-# pylint: disable=redefined-outer-name,protected-access
+# Tests for Junior DevOps Environment
+# Covers all difficulty levels and grading logic
 
 import pytest
 import sys, os

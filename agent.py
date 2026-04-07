@@ -1,15 +1,5 @@
-"""
-PyTorch Agent — uses an LLM-backed policy to solve the JuniorDevOpsEnv.
-
-Architecture
-------------
-1. ObservationEncoder  : encodes the current state dict into a fixed-size tensor
-2. PolicyNetwork       : lightweight MLP that picks the next command template
-3. LLMFiller           : uses an LLM (via requests) to fill in command arguments
-4. DevOpsAgent         : combines the above into a full rollout loop
-
-The agent can also run in RULE_BASED mode (no GPU needed) for fast testing.
-"""
+# PyTorch Agent for Junior DevOps Environment
+# Uses LLM to fill in command arguments for solving tasks
 
 import torch
 import torch.nn as nn

@@ -1,11 +1,5 @@
-"""
-Junior DevOps Environment — OpenEnv-Compatible
-================================================
-A stateful simulation of a broken Linux server.
-The agent must diagnose and fix issues using terminal-like commands.
-
-Implements: reset(), step(), state() — required by OpenEnv API
-"""
+# Junior DevOps Environment
+# Stateful simulation of a broken Linux server for AI agents
 
 import random
 import re

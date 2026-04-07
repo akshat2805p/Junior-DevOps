@@ -12,8 +12,7 @@ short_description: OpenEnv-compatible Linux server simulation for AI agents
 
 # 🖥️ Junior DevOps Environment
 
-> **Meta PyTorch Hackathon Submission** — an OpenEnv-compatible real-world simulation
-> where an AI agent must diagnose and fix a broken Linux server.
+> A stateful simulation of a production Linux server where AI agents practice DevOps tasks.
 
 ---
 
@@ -74,12 +73,46 @@ restart nginx
 
 ---
 
-## Quick Start
+## Setup and Installation
+
+### Prerequisites
+- Python 3.8+
+- Docker (optional, for containerized deployment)
+
+### Local Development
+
+1. Clone the repository:
+```bash
+git clone https://github.com/akshat2805p/Junior-DevOps.git
+cd Junior-DevOps
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Run the server:
+```bash
+python server.py
+```
+
+The server will start on `http://localhost:7860`.
+
+### Docker Deployment
+
+Build and run with Docker:
+```bash
+docker build -t junior-devops .
+docker run -p 7860:7860 junior-devops
+```
+
+## API Usage
 
 ### 1. Reset the Environment
 
 ```bash
-curl -X POST https://your-space.hf.space/reset \
+curl -X POST http://localhost:7860/reset \
   -H "Content-Type: application/json" \
   -d '{"difficulty": "hard", "seed": 42}'
 ```
@@ -87,7 +120,7 @@ curl -X POST https://your-space.hf.space/reset \
 ### 2. Take an Action
 
 ```bash
-curl -X POST https://your-space.hf.space/step \
+curl -X POST http://localhost:7860/step \
   -H "Content-Type: application/json" \
   -d '{"action": "cat /etc/nginx/nginx.conf"}'
 ```
@@ -113,7 +146,7 @@ Response:
 ### 3. Read Current State
 
 ```bash
-curl https://your-space.hf.space/state
+curl http://localhost:7860/state
 ```
 
 ---
@@ -172,4 +205,12 @@ python agent.py --train --difficulty hard --episodes 100
 Rewards are **cumulative and partial** — no binary 0/1 scoring.
 
 ---
+
+## Contributing
+
+Feel free to open issues or submit pull requests for improvements.
+
+## License
+
+MIT License
 
